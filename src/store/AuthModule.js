@@ -73,6 +73,7 @@ const AuthModule = {
             .ref("users")
             .child(auth.user.uid)
             .once("value", function(data) {
+              console.log(data);
               commit("setLoading", false);
               const newUser = {
                 id: auth.user.uid,

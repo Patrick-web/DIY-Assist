@@ -25,6 +25,9 @@ new Vue({
       measurementId: "G-VGBVDDVD5D",
       databaseURL: "https://diy-assist-default-rtdb.firebaseio.com/",
     });
+    const DB = firebase.default.firestore();
+    DB.settings({ timestampsInSnapshots: true });
+    window.DB = DB;
     // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   },
 }).$mount("#app");
