@@ -49,7 +49,7 @@
                   label="Payment Rate per min*"
                   required
                   type="number"
-                  v-model="rate"
+                  v-model="paymentRate"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -71,29 +71,41 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import * as firebase from "firebase";
+import { v4 as uuidv4 } from "uuid";
 
 export default {
   computed: {
     ...mapGetters(["user"]),
   },
   methods: {
-    createTask() {
-      const DB = firebase.default.firestore();
-      DB.collection("tasks").add({
-        userName: this.user.userName.replace("@gmail.com", ""),
-        createdTasks: [
-          {
-            id: uuidv4(),
-            title: this.title,
-            description: this.description,
-            paymentRate: this.paymentRate,
-            timeLimit: this.timeLimit,
-            creationTime: Date.now(),
-          },
-        ],
-      });
-      this.dialog = false;
+    async getAvatar() {
+      let img;
+      await fetch("https://ui-avatars.com/api/?name=John+Doe", {
+        method: "GET",
+        redirect: "follow",
+      })
+        .then((response) => response.text())
+        .then((result) => (img = result))
+        .catch((error) => console.log("error", error));
+      return img;
+    },
+    async createTask() {
+      const task = {
+        ownerID: this.user.id,
+        owner: this.user.username,
+        title: this.title,
+        description: this.description,
+        paymentRate: this.paymentRate,
+        timeLimit: this.timeLimit,
+        state: "pending",
+        creationTime: Date.now(),
+      };
+      console.log(task);
+      window.DB.collection("AllTasks")
+        .add(task)
+        .then(() => {
+          this.dialog = false;
+        });
     },
   },
   data: () => ({
@@ -101,9 +113,11 @@ export default {
     durations: ["5 min", "10 min", "20 min", "30 min", "1hr"],
     title: "",
     timeLimit: "",
-    rate: "",
+    paymentRate: "",
     description: "",
   }),
-  mounted() {},
+  mounted() {
+    console.log(this.user);
+  },
 };
 </script>

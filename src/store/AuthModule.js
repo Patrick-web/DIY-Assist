@@ -50,6 +50,16 @@ const AuthModule = {
                 username: payload.username,
               };
               commit("setUser", newUser);
+              window.DB.collection("tasks")
+                .doc(newUser.id)
+                .set({
+                  userName: newUser.username,
+                  createdTasks: [],
+                });
+              window.DB.collection("users").add({
+                username: payload.username,
+                email: payload.email,
+              });
             })
             .catch((error) => {
               commit("setLoading", false);
@@ -73,13 +83,22 @@ const AuthModule = {
             .ref("users")
             .child(auth.user.uid)
             .once("value", function(data) {
-              console.log(data);
-              commit("setLoading", false);
-              const newUser = {
-                id: auth.user.uid,
-                username: auth.user.email,
-              };
-              commit("setUser", newUser);
+              window.DB.collection("users")
+                .where("email", "==", auth.user.email)
+                .get()
+                .then(function(querySnapshot) {
+                  querySnapshot.forEach(function(doc) {
+                    commit("setLoading", false);
+                    const newUser = {
+                      id: auth.user.uid,
+                      username: doc.data().username,
+                    };
+                    commit("setUser", newUser);
+                  });
+                })
+                .catch(function(error) {
+                  commit("setError", error);
+                });
             });
         })
         .catch((error) => {

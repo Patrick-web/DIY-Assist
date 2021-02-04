@@ -6,9 +6,9 @@
           alt="Vuetify Logo"
           class="shrink mr-2"
           contain
-          src="@/assets/logo.png"
+          src="@/assets/logo.svg"
           transition="scale-transition"
-          width="150"
+          width="30"
         />
       </div>
 
